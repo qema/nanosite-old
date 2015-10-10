@@ -75,16 +75,16 @@ def make_menu():
                           "<a href=\"{}\">{}</a></div>")
     
     menu_string = "<div class=\"menu\">"
+    # Home link
+    menu_string += menu_item_template.format(SiteUrl + "index.html", "Home")
 
     # TODO: directories as part of menu
 
     files = load_pages()[1]
-    files_plus_home = dict(files)
-    files_plus_home["index"] = ("", {"title": ["Home"]})
-    for filename in files_plus_home:
+    for filename in files:
         name = os.path.splitext(filename)[0]
         url = SiteUrl + name + ".html"
-        meta = files_plus_home[filename][1]
+        meta = files[filename][1]
         title = meta["title"][0] if "title" in meta else name
         menu_string += menu_item_template.format(url, title)
     menu_string += "</div>"
