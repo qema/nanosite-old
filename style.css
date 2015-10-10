@@ -1,8 +1,29 @@
 body {
+    font-family: "Menlo", "Bitstream Vera Sans Mono", "Courier New";
+    margin-left: 20%;
+    margin-right: 20%;
 }
+
+.content {
+}
+
 h1 {
+    font-size: 36px;
 }
+
+.post {
+    margin-bottom: 5em;
+}
+
+.post-title {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.post-meta {
+    font-size: 0.8em;
+}
+
 p {
-    font-family: "Menlo";
-    font-size: 12px;
+    font-size: 1em;
 }
