@@ -4,11 +4,20 @@ body {
     margin-right: 20%;
 }
 
-.content {
+.header {
+    text-align: center;
+    margin-bottom: 3em;
 }
 
-h1 {
-    font-size: 36px;
+.header-title {
+    font-size: 3em;
+}
+
+.header-tagline {
+    font-size: 0.8em;
+}
+
+.content {
 }
 
 .post {

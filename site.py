@@ -1,6 +1,7 @@
 # Settings
 SiteAttribs = {"$TITLE$": "Paradoxical",
-           "$AUTHOR$": "Andrew Wang"}
+               "$TAGLINE$": "A computer science blog.",
+               "$AUTHOR$": "Andrew Wang"}
 PostsDirectory = "posts"    # no slash
 
 import markdown
