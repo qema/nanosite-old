@@ -23,6 +23,11 @@ body {
     padding: 0;
 }
 
+.menu-item {
+    display: inline;
+    margin: 1em;
+}
+
 .content {
 }
 
@@ -30,7 +35,7 @@ body {
     margin-bottom: 5em;
 }
 
-.post-title {
+.page-title, .post-title {
     margin-top: 0;
     margin-bottom: 0;
     font-size: 1.8em;
