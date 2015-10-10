@@ -11,9 +11,10 @@ CONTENT - Main content (will be generated from post-template.html) -->
     <title>Paradoxical</title>
 </head>
 <body>
-  <!-- Template for header of every page. Client must provide:
+  <!-- Template for site header. Client must provide:
 TITLE: Title of site.
-TAGLINE: Tagline. -->
+TAGLINE: Tagline.
+MENU: Navigation bar. -->
 
 <div class="header">
   <div class="header-title">
@@ -21,6 +22,9 @@ TAGLINE: Tagline. -->
   </div>
   <div class="header-tagline">
     A computer science blog.
+  </div>
+  <div class="header-menu">
+    <ul class="menu"><li><a href="./code.html">Code</a></li></ul>
   </div>
 </div>
 
@@ -38,10 +42,10 @@ POST_CONTENT: HTML (not Markdown) content of post. -->
     <div class="post-title">
       This is another title.
     </div>
-    <section class="post-content">
-      <p>This is another post.</p>
-    </section>
   </header>
+  <section class="post-content">
+    <p>This is another post.</p>
+  </section>
 </article>
 <!-- Template for each post. Client must provide:
 POST_DATE: Date posted.
@@ -56,10 +60,10 @@ POST_CONTENT: HTML (not Markdown) content of post. -->
     <div class="post-title">
       This is a title.
     </div>
-    <section class="post-content">
-      <p>This is a post.</p>
-    </section>
   </header>
+  <section class="post-content">
+    <p>This is a post.</p>
+  </section>
 </article>
 
   </div>
