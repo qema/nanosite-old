@@ -3,6 +3,7 @@ SiteAttribs = {"$TITLE$": "Paradoxical",
                "$TAGLINE$": "A computer science blog.",
                "$AUTHOR$": "Andrew Wang"}
 PostsDirectory = "posts"    # no slash
+#FrontPageNumPosts = 10      # how many posts to show on front page
 
 import markdown
 import os
@@ -10,6 +11,8 @@ import datetime
 
 front_template = \
     open("front-template.html", "r").read()
+header_template = \
+    open("header-template.html", "r").read()
 post_template = \
     open("post-template.html", "r").read()
 
@@ -41,7 +44,10 @@ def date_of_file(p):
 def string_of_date(date):
     return "{} {} {}".format(date.day, date.strftime("%b"), date.year)
 
-def insert_posts_as_content(p):
+def make_header():
+    return insert_attribs(header_template, SiteAttribs)
+
+def make_content_from_posts():
     posts = ""
 
     paths = []
@@ -61,11 +67,12 @@ def insert_posts_as_content(p):
             html = make_post_from_markdown(post_md, date)
             # append
             posts += html
-    return p.replace("$CONTENT$", posts)
+    return posts
 
-page = front_template
-page = insert_attribs(page, SiteAttribs)
-page = insert_posts_as_content(page)
+attribs = {"$TITLE$": SiteAttribs["$TITLE$"],
+           "$HEADER$": make_header(),
+           "$CONTENT$": make_content_from_posts()}
+page = insert_attribs(front_template, attribs)
 
 print(page)
 

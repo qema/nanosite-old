@@ -1,3 +1,8 @@
+<!-- Template for front page. Client must provide: 
+TITLE - Title of site
+HEADER - Header bar (will be generated from header-template.html)
+CONTENT - Main content (will be generated from post-template.html) -->
+
 <!DOCTYPE html>
 <html>
 <head lang="en">
@@ -6,16 +11,26 @@
     <title>Paradoxical</title>
 </head>
 <body>
-  <div class="header">
-    <div class="header-title">
-      Paradoxical
-    </div>
-    <div class="header-tagline">
-      A computer science blog.
-    </div>
+  <!-- Template for header of every page. Client must provide:
+TITLE: Title of site.
+TAGLINE: Tagline. -->
+
+<div class="header">
+  <div class="header-title">
+    Paradoxical
   </div>
+  <div class="header-tagline">
+    A computer science blog.
+  </div>
+</div>
+
   <div class="content">
-    <article class="post">
+    <!-- Template for each post. Client must provide:
+POST_DATE: Date posted.
+POST_TITLE: Title of post.
+POST_CONTENT: HTML (not Markdown) content of post. -->
+
+<article class="post">
   <header class="post-header">
     <div class="post-meta">
       10 Oct 2015
@@ -28,6 +43,11 @@
     </section>
   </header>
 </article>
+<!-- Template for each post. Client must provide:
+POST_DATE: Date posted.
+POST_TITLE: Title of post.
+POST_CONTENT: HTML (not Markdown) content of post. -->
+
 <article class="post">
   <header class="post-header">
     <div class="post-meta">

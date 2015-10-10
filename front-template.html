@@ -1,3 +1,8 @@
+<!-- Template for front page. Client must provide: 
+TITLE - Title of site
+HEADER - Header bar (will be generated from header-template.html)
+CONTENT - Main content (will be generated from post-template.html) -->
+
 <!DOCTYPE html>
 <html>
 <head lang="en">
@@ -6,14 +11,7 @@
     <title>$TITLE$</title>
 </head>
 <body>
-  <div class="header">
-    <div class="header-title">
-      $TITLE$
-    </div>
-    <div class="header-tagline">
-      $TAGLINE$
-    </div>
-  </div>
+  $HEADER$
   <div class="content">
     $CONTENT$
   </div>
