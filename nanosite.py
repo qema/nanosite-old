@@ -1,22 +1,11 @@
-# Settings
-SiteAttribs = {"$TITLE$": "Paradoxical",
-               "$TAGLINE$": "A computer science blog.",
-               "$AUTHOR$": "Andrew Wang"}
-SiteUrl = "./"
-PostsDirectory = "posts/"    # with trailing slash
-PagesDirectory = "pages/"    # with trailing slash
-#PageNumPosts = 10      # how many posts to show on front page
-
 import markdown
 import os
 import datetime
 
-main_template = open("main-template.html", "r").read()
-header_template = open("header-template.html", "r").read()
-post_template = open("post-template.html", "r").read()
-page_template = open("page-template.html", "r").read()
-footer_template = open("footer-template.html", "r").read()
-                
+PostsDirectory = "posts/"    # with trailing slash
+PagesDirectory = "pages/"    # with trailing slash
+#PageNumPosts = 10      # how many posts to show on front page
+
 def insert_attribs(p, attribs):
     for attrib in attribs:
         p = p.replace(attrib, attribs[attrib])
@@ -28,7 +17,8 @@ def load_markdown(filename):
     # Markdown will parse metadata in posts
     md = markdown.Markdown(extensions = ["markdown.extensions.meta"])
     html = md.convert(file_md)
-    meta = md.Meta if md.Meta is not None else {}
+    meta = {k: "".join(v) for k, v in md.Meta.items()} \
+           if md.Meta is not None else {}
     return (html, meta)
 
 # precondition: directory ends with a slash '/'
@@ -55,7 +45,7 @@ def load_pages(directory=PagesDirectory):
 # returns html string given a post filename
 def make_post(filename, post_date=""):
     post_content, meta = load_markdown(filename)
-    post_title = meta["title"][0] if "title" in meta else ""
+    post_title = meta["title"] if "title" in meta else ""
     
     post_attribs = {"$POST_TITLE$": post_title,
                     "$POST_CONTENT$": post_content,
@@ -78,7 +68,8 @@ def make_menu(pages, base=True):
     if base:
         menu_string += "<nav class=\"nav-bar\"><ul>"
         # Home link
-        menu_string += menu_item_template.format(SiteUrl + "index.html", \
+        site_url = site_meta["url"]
+        menu_string += menu_item_template.format(site_url + "index.html", \
                                                  "Home")
         # Directories become categories
         # Only do this in base case (no subdirectories allowed)
@@ -93,9 +84,9 @@ def make_menu(pages, base=True):
     files = pages[1]
     for filename in files:
         name = os.path.splitext(filename)[0]
-        url = SiteUrl + name + ".html"
+        url = site_meta["url"] + name + ".html"
         meta = files[filename][1]
-        title = meta["title"][0] if "title" in meta else name
+        title = meta["title"] if "title" in meta else name
         menu_string += menu_item_template.format(url, title)
 
     if base:
@@ -110,9 +101,9 @@ def make_header():
         return header_cache
     
     menu = make_menu(load_pages())
-    attribs = {"$SITE_URL$": SiteUrl,
-               "$TITLE$": SiteAttribs["$TITLE$"],
-               "$TAGLINE$": SiteAttribs["$TAGLINE$"],
+    attribs = {"$SITE_URL$": site_meta["url"],
+               "$TITLE$": site_meta["title"],
+               "$TAGLINE$": site_meta["tagline"],
                "$MENU$": menu}
     header_cache = insert_attribs(header_template, attribs)
     return header_cache
@@ -138,12 +129,12 @@ def make_content_from_posts():
     return posts
 
 def make_footer():
-    attribs = {"$AUTHOR$": SiteAttribs["$AUTHOR$"]}
+    attribs = {"$AUTHOR$": site_meta["author"]}
     return insert_attribs(footer_template, attribs)
 
 def gen_front():
-    attribs = {"$SITE_URL$": SiteUrl,
-               "$TITLE$": SiteAttribs["$TITLE$"],
+    attribs = {"$SITE_URL$": site_meta["url"],
+               "$TITLE$": site_meta["title"],
                "$HEADER$": make_header(),
                "$CONTENT$": make_content_from_posts(),
                "$FOOTER$": make_footer()}
@@ -157,12 +148,13 @@ def gen_front():
 def gen_page(filename, page):
     html, meta = page
     name = os.path.splitext(filename)[0]
-    page_title = meta["title"][0] if "title" in meta else name
+    page_title = meta["title"] if "title" in meta else name
     attribs = {"$PAGE_TITLE$": page_title,
                "$CONTENT$": html}
     content = insert_attribs(page_template, attribs)
 
-    attribs = {"$TITLE$": SiteAttribs["$TITLE$"],
+    attribs = {"$SITE_URL$": site_meta["url"],
+               "$TITLE$": site_meta["title"],
                "$HEADER$": make_header(),
                "$CONTENT$": content,
                "$FOOTER$": make_footer()}
@@ -180,6 +172,16 @@ def gen_pages(pages=load_pages()):
     files = pages[1]
     for filename in files:
         gen_page(filename, files[filename])
+
+# Settings
+# NB: All URLs must have trailing slash
+site_meta = load_markdown("meta.md")[1]  # get meta info only
+
+main_template = open("main-template.html", "r").read()
+header_template = open("header-template.html", "r").read()
+post_template = open("post-template.html", "r").read()
+page_template = open("page-template.html", "r").read()
+footer_template = open("footer-template.html", "r").read()
 
 gen_front()
 gen_pages()

@@ -2,14 +2,15 @@
 SITE_URL - URL of site (with trailing slash)
 TITLE - Title of site
 HEADER - Header bar (will be generated from header-template.html)
-CONTENT - Main content (will be generated from post-template.html) -->
+CONTENT - Main content (will be generated from post-template.html)
+FOOTER - Footer bar (will be generated from footer-template.html) -->
 
 <!DOCTYPE html>
 <html>
 <head lang="en">
     <meta charset="utf-8">
-    <link rel="stylesheet" type="text/css" href="$SITE_URL$style.css">
-    <title>Paradoxical</title>
+    <link rel="stylesheet" type="text/css" href="./style.css">
+    <title>Test Site</title>
 </head>
 <body>
   <!-- Template for site header. Client must provide:
@@ -20,13 +21,13 @@ MENU: Navigation bar. -->
 
 <div class="header">
   <a href="./index.html" class="header-title">
-    Paradoxical
+    Test Site
   </a>
   <div class="header-tagline">
-    A computer science blog.
+    This is the tagline.
   </div>
   <div class="header-menu">
-    <nav class="nav-bar"><ul><li><a href="./index.html">Home</a></li><li><a href="#">Code</a><ul><li><a href="./proj2.html">Project Omega</a></li><li><a href="./proj1.html">Project Beta</a></li></ul></li><li><a href="#">Music</a><ul><li><a href="./proj1.html">Project Treble</a></li></ul></li></ul></nav>
+    <nav class="nav-bar"><ul><li><a href="./index.html">Home</a></li><li><a href="#">Code</a><ul><li><a href="./proj1.html">Project Beta</a></li><li><a href="./proj2.html">Project Omega</a></li></ul></li><li><a href="#">Music</a><ul><li><a href="./proj1.html">Project Treble</a></li></ul></li></ul></nav>
   </div>
 </div>
 
@@ -38,14 +39,11 @@ CONTENT: HTML (not Markdown) content of page. -->
 <article class="page">
   <header class="page-header">
     <div class="page-title">
-      Project Beta
+      Project Treble
     </div>
   </header>
   <section class="page-content">
-    <p>This is a page. Aaah</p>
-<pre><code>print("Hello")
-let x = 3 + 3 * 6
-</code></pre>
+    <p>This is a page. EIEIO</p>
   </section>
 </article>
 
