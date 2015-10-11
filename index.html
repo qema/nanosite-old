@@ -24,7 +24,7 @@ MENU: Navigation bar. -->
     A computer science blog.
   </div>
   <div class="header-menu">
-    <div class="menu"><div class="menu-item"><a href="./index.html">Home</a></div><div class="menu-item"><a href="./code.html">Code</a></div></div>
+    <nav class="nav-bar"><ul><li><a href="./index.html">Home</a></li><li><a href="#">Code</a><ul><li><a href="./proj2.html">Project Omega</a></li><li><a href="./proj1.html">Project Beta</a></li></ul></li><li><a href="#">Music</a><ul><li><a href="./proj1.html">Project Treble</a></li></ul></li></ul></nav>
   </div>
 </div>
 
@@ -40,11 +40,14 @@ POST_CONTENT: HTML (not Markdown) content of post. -->
       10 Oct 2015
     </div>
     <div class="post-title">
-      This is another title.
+      This is a title.
     </div>
   </header>
   <section class="post-content">
-    <p>This is another post.</p>
+    <p>This is a post.</p>
+<pre><code>print("Hello, World!")
+let x = 3 + 3 * 6
+</code></pre>
   </section>
 </article>
 <!-- Template for each post. Client must provide:
@@ -58,11 +61,11 @@ POST_CONTENT: HTML (not Markdown) content of post. -->
       10 Oct 2015
     </div>
     <div class="post-title">
-      This is a title.
+      This is another title.
     </div>
   </header>
   <section class="post-content">
-    <p>This is a post.</p>
+    <p>This is another post.</p>
   </section>
 </article>
 

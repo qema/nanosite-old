@@ -31,16 +31,16 @@ def load_markdown(filename):
     return (html, meta)
 
 # precondition: directory ends with a slash '/'
-pages_cache = None
+pages_cache = {}
 def load_pages(directory=PagesDirectory):
     global pages_cache
-    if pages_cache is not None:
-        return pages_cache
+    if directory in pages_cache:
+        return pages_cache[directory]
     
     # first element is set of directories, recursively loaded;
     # second element is the files in this directory converted to html
     pages = [{}, {}]
-    for filename in sorted(os.listdir(PagesDirectory)):
+    for filename in sorted(os.listdir(directory)):
         path = directory + filename
         # only process Markdown files
         if os.path.isfile(path) and os.path.splitext(filename)[1] == ".md":
@@ -48,7 +48,7 @@ def load_pages(directory=PagesDirectory):
         elif os.path.isdir(path):
             pages[0][filename] = load_pages(directory + filename + "/")
 
-    pages_cache = pages
+    pages_cache[directory] = pages
     return pages
             
 # returns html string given a post filename
@@ -69,25 +69,37 @@ def date_of_file(filename):
 def string_of_date(date):
     return "{} {} {}".format(date.day, date.strftime("%b"), date.year)
 
-# returns navigation bar with class [menu] and list items class [menu-item]
-def make_menu():
-    menu_item_template = ("<div class=\"menu-item\">"
-                          "<a href=\"{}\">{}</a></div>")
-    
-    menu_string = "<div class=\"menu\">"
-    # Home link
-    menu_string += menu_item_template.format(SiteUrl + "index.html", "Home")
+# returns navigation bar with [nav] element, and list items class [menu-item]
+def make_menu(pages, base=True):
+    menu_item_template = "<li><a href=\"{}\">{}</a></li>"
 
-    # TODO: directories as part of menu
+    menu_string = ""
+    if base:
+        menu_string += "<nav class=\"nav-bar\"><ul>"
+        # Home link
+        menu_string += menu_item_template.format(SiteUrl + "index.html", \
+                                                 "Home")
+        # Directories become categories
+        # Only do this in base case (no subdirectories allowed)
+        directories = pages[0]
+        for directory in sorted(directories):
+            menu_string += "<li><a href=\"#\">{}</a>".format(directory)
+            menu_string += "<ul>"
+            menu_string += make_menu(directories[directory], base=False)
+            menu_string += "</ul></li>"
 
-    files = load_pages()[1]
+    # Files
+    files = pages[1]
     for filename in files:
         name = os.path.splitext(filename)[0]
         url = SiteUrl + name + ".html"
         meta = files[filename][1]
         title = meta["title"][0] if "title" in meta else name
         menu_string += menu_item_template.format(url, title)
-    menu_string += "</div>"
+
+    if base:
+        menu_string += "</ul></nav>"
+        
     return menu_string
 
 header_cache = None
@@ -96,7 +108,7 @@ def make_header():
     if header_cache is not None:
         return header_cache
     
-    menu = make_menu()
+    menu = make_menu(load_pages())
     attribs = {"$TITLE$": SiteAttribs["$TITLE$"],
                "$TAGLINE$": SiteAttribs["$TAGLINE$"],
                "$MENU$": menu}
@@ -128,8 +140,6 @@ def gen_front():
                "$HEADER$": make_header(),
                "$CONTENT$": make_content_from_posts()}
     page = insert_attribs(main_template, attribs)
-
-    print(page)
 
     output_file = open("index.html", "w")
     output_file.write(page)
