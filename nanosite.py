@@ -15,6 +15,7 @@ main_template = open("main-template.html", "r").read()
 header_template = open("header-template.html", "r").read()
 post_template = open("post-template.html", "r").read()
 page_template = open("page-template.html", "r").read()
+footer_template = open("footer-template.html", "r").read()
                 
 def insert_attribs(p, attribs):
     for attrib in attribs:
@@ -109,7 +110,8 @@ def make_header():
         return header_cache
     
     menu = make_menu(load_pages())
-    attribs = {"$TITLE$": SiteAttribs["$TITLE$"],
+    attribs = {"$SITE_URL$": SiteUrl,
+               "$TITLE$": SiteAttribs["$TITLE$"],
                "$TAGLINE$": SiteAttribs["$TAGLINE$"],
                "$MENU$": menu}
     header_cache = insert_attribs(header_template, attribs)
@@ -135,10 +137,15 @@ def make_content_from_posts():
             posts += html
     return posts
 
+def make_footer():
+    attribs = {"$AUTHOR$": SiteAttribs["$AUTHOR$"]}
+    return insert_attribs(footer_template, attribs)
+
 def gen_front():
     attribs = {"$TITLE$": SiteAttribs["$TITLE$"],
                "$HEADER$": make_header(),
-               "$CONTENT$": make_content_from_posts()}
+               "$CONTENT$": make_content_from_posts(),
+               "$FOOTER$": make_footer()}
     page = insert_attribs(main_template, attribs)
 
     output_file = open("index.html", "w")
@@ -156,17 +163,20 @@ def gen_page(filename, page):
 
     attribs = {"$TITLE$": SiteAttribs["$TITLE$"],
                "$HEADER$": make_header(),
-               "$CONTENT$": content}
+               "$CONTENT$": content,
+               "$FOOTER$": make_footer()}
     page_output = insert_attribs(main_template, attribs)
     
     output_file = open(name + ".html", "w")
     output_file.write(page_output)
     output_file.close()
     
-def gen_pages():
-    # TODO: pages in subdirectories
+def gen_pages(pages=load_pages()):
+    directories = pages[0]
+    for directory in directories:
+        gen_pages(directories[directory])
 
-    files = load_pages()[1]
+    files = pages[1]
     for filename in files:
         gen_page(filename, files[filename])
 

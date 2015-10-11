@@ -1,12 +1,13 @@
 <!-- Template for site header. Client must provide:
+SITE_URL: URL of site (with trailing slash)
 TITLE: Title of site.
 TAGLINE: Tagline.
 MENU: Navigation bar. -->
 
 <div class="header">
-  <div class="header-title">
+  <a href="$SITE_URL$index.html" class="header-title">
     $TITLE$
-  </div>
+  </a>
   <div class="header-tagline">
     $TAGLINE$
   </div>
