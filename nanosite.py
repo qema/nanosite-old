@@ -142,7 +142,8 @@ def make_footer():
     return insert_attribs(footer_template, attribs)
 
 def gen_front():
-    attribs = {"$TITLE$": SiteAttribs["$TITLE$"],
+    attribs = {"$SITE_URL$": SiteUrl,
+               "$TITLE$": SiteAttribs["$TITLE$"],
                "$HEADER$": make_header(),
                "$CONTENT$": make_content_from_posts(),
                "$FOOTER$": make_footer()}

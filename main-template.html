@@ -1,4 +1,5 @@
 <!-- Template for every page. Client must provide: 
+SITE_URL - URL of site (with trailing slash)
 TITLE - Title of site
 HEADER - Header bar (will be generated from header-template.html)
 CONTENT - Main content (will be generated from post-template.html) -->
@@ -7,7 +8,7 @@ CONTENT - Main content (will be generated from post-template.html) -->
 <html>
 <head lang="en">
     <meta charset="utf-8">
-    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="text/css" href="$SITE_URL$style.css">
     <title>$TITLE$</title>
 </head>
 <body>
