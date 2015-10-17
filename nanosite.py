@@ -7,12 +7,29 @@ PagesDirectory = "pages/"    # with trailing slash
 #PageNumPosts = 10      # how many posts to show on front page
 
 def insert_attribs(p, attribs):
+    """This is the main mechanism to fill in templates by replacing
+    "hook" strings with the content that should fill them.
+    
+    Keyword arguments:
+    p -- String containing the template to be filled in.
+    attribs -- Dictionary mapping template "hooks"
+               (which will always be in the form $STRING$)
+               to the strings which should replace them."""
+    
     for attrib in attribs:
         p = p.replace(attrib, attribs[attrib])
     return p
 
-# returns (html, meta) tuple
 def load_markdown(filename):
+    """Converts a Markdown file to HTML and returns a tuple (html, meta) where
+    [html] is the converted contents of the file and [meta] is a dictionary
+    mapping meta properties to values. These meta properties are given at the
+    top of Markdown files as follows:
+
+    Name1: Value1
+    Name2: Value2
+    ..."""
+    
     file_md = open(filename, "r").read()
     # Markdown will parse metadata in posts
     md = markdown.Markdown(extensions = ["markdown.extensions.meta"])
@@ -21,9 +38,11 @@ def load_markdown(filename):
            if md.Meta is not None else {}
     return (html, meta)
 
-# precondition: directory ends with a slash '/'
 pages_cache = {}
 def load_pages(directory=PagesDirectory):
+    """ Loads and returns all of the pages in [directory].
+    These are cached so they are only loaded on the first call.
+    Precondition: directory name ends with a slash '/'."""
     global pages_cache
     if directory in pages_cache:
         return pages_cache[directory]
@@ -41,9 +60,10 @@ def load_pages(directory=PagesDirectory):
 
     pages_cache[directory] = pages
     return pages
-            
-# returns html string given a post filename
+
 def make_post(filename, post_date=""):
+    """Builds the post with filename [filename] and returns the completed
+    HTML string."""
     post_content, meta = load_markdown(filename)
     post_title = meta["title"] if "title" in meta else ""
     
@@ -52,16 +72,19 @@ def make_post(filename, post_date=""):
                     "$POST_DATE$": post_date}
     return insert_attribs(post_template, post_attribs)
 
-# gets date by creation date
 def date_of_file(filename):
-    t = os.path.getctime(filename)
+    """Gets the creation date of the file."""
+    t = os.stat(filename).st_birthtime
     return datetime.datetime.fromtimestamp(t)
 
 def string_of_date(date):
+    """Returns formatted string D Mon Y"""
     return "{} {} {}".format(date.day, date.strftime("%b"), date.year)
 
-# returns navigation bar with [nav] element, and list items class [menu-item]
 def make_menu(pages, base=True):
+    """Returns navigation bar encapsulated in <nav> element.
+    Built from a list (so <li>, <ul> elements).
+    List items are given class "menu-item"."""
     menu_item_template = "<li><a href=\"{}\">{}</a></li>"
 
     menu_string = ""
@@ -96,6 +119,8 @@ def make_menu(pages, base=True):
 
 header_cache = None
 def make_header():
+    """Builds the site header and returns the completed HTML code.
+    This is cached so it's only built on the first call."""
     global header_cache
     if header_cache is not None:
         return header_cache
@@ -109,6 +134,7 @@ def make_header():
     return header_cache
 
 def make_content_from_posts():
+    """Builds and concatenates together all posts in the posts directory."""
     posts = ""
 
     paths = []
@@ -128,11 +154,19 @@ def make_content_from_posts():
             posts += html
     return posts
 
+footer_cache = None
 def make_footer():
+    """Builds the site footer and returns the completed HTML code.
+    This is cached so it's only built on the first call."""
+    if footer_cache is not None:
+        return footer_cache
+    
     attribs = {"$AUTHOR$": site_meta["author"]}
-    return insert_attribs(footer_template, attribs)
+    footer_cache = insert_attribs(footer_template, attribs)
+    return footer_cache
 
 def gen_front():
+    """Builds the front page and writes to index.html."""
     attribs = {"$SITE_URL$": site_meta["url"],
                "$TITLE$": site_meta["title"],
                "$HEADER$": make_header(),
@@ -144,8 +178,10 @@ def gen_front():
     output_file.write(page)
     output_file.close()
 
-# [page] is the (html, meta) tuple given by [load_markdown]
 def gen_page(filename, page):
+    """Generates the page with filename [filename] and contents [page] in the
+    form of the (html, meta) tuple outputted by [load_markdown]."""
+    
     html, meta = page
     name = os.path.splitext(filename)[0]
     page_title = meta["title"] if "title" in meta else name
@@ -165,6 +201,7 @@ def gen_page(filename, page):
     output_file.close()
     
 def gen_pages(pages=load_pages()):
+    """Generate all pages."""
     directories = pages[0]
     for directory in directories:
         gen_pages(directories[directory])
@@ -173,8 +210,8 @@ def gen_pages(pages=load_pages()):
     for filename in files:
         gen_page(filename, files[filename])
 
-# Settings
-# NB: All URLs must have trailing slash
+# Load settings as meta attributes from "meta.md"
+# Note: All URLs must have trailing slash
 site_meta = load_markdown("meta.md")[1]  # get meta info only
 
 main_template = open("main-template.html", "r").read()
