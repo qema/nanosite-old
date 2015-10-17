@@ -159,6 +159,7 @@ footer_cache = None
 def make_footer():
     """Builds the site footer and returns the completed HTML code.
     This is cached so it's only built on the first call."""
+    global footer_cache
     if footer_cache is not None:
         return footer_cache
     
