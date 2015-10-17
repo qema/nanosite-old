@@ -4,6 +4,7 @@ import datetime
 
 PostsDirectory = "posts/"    # with trailing slash
 PagesDirectory = "pages/"    # with trailing slash
+TemplatesDirectory = "templates/"
 #PageNumPosts = 10      # how many posts to show on front page
 
 def insert_attribs(p, attribs):
@@ -209,16 +210,16 @@ def gen_pages(pages=load_pages()):
     files = pages[1]
     for filename in files:
         gen_page(filename, files[filename])
-
+    
 # Load settings as meta attributes from "meta.md"
 # Note: All URLs must have trailing slash
 site_meta = load_markdown("meta.md")[1]  # get meta info only
 
-main_template = open("main-template.html", "r").read()
-header_template = open("header-template.html", "r").read()
-post_template = open("post-template.html", "r").read()
-page_template = open("page-template.html", "r").read()
-footer_template = open("footer-template.html", "r").read()
+main_template = open(TemplatesDirectory + "main-template.html", "r").read()
+header_template = open(TemplatesDirectory + "header-template.html", "r").read()
+post_template = open(TemplatesDirectory + "post-template.html", "r").read()
+page_template = open(TemplatesDirectory + "page-template.html", "r").read()
+footer_template = open(TemplatesDirectory + "footer-template.html", "r").read()
 
 gen_front()
 gen_pages()
