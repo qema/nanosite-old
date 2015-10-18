@@ -1,13 +1,10 @@
 from setuptools import setup
-from nanosite import __version__
+from nanosite_gen.nanosite_gen import __version__
 
 setup(name = "nanosite",
       version = __version__,
+      url = "https://github.com/qema/nanosite",
       author = "Andrew Wang",
       scripts = ["nanosite"],
-      py_modules = ["nanosite_gen"],
-      data_files = [("templates", ["templates/footer-template.html",
-                                 "templates/header-template.html",
-                                 "templates/main-template.html",
-                                 "templates/page-template.html",
-                                 "templates/post-template.html"])])
+      packages = ["nanosite_gen"],
+      package_data = {"nanosite_gen": ["templates/*.html", "style.css"]})

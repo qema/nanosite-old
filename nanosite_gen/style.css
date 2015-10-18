@@ -17,6 +17,7 @@ body {
 }
 
 .header-title:hover {
+    color: black;
     text-decoration: underline;
 }
 
@@ -103,10 +104,15 @@ p {
     font-size: 1em;
 }
 
-pre {
-    font-family: Menlo, "Courier New";
-    background: lightgray;
-    padding: 1em;
+a {
+    color: black;
+}
+a:hover {
+    color: red;
+}
+
+h2 {
+    font-size: 1.2em;
 }
 
 .footer {

@@ -1,6 +1,8 @@
 #!python
 
-import nanosite_gen
+import sys
+import os
+from nanosite_gen.nanosite_gen import main
 
 if __name__ == "__main__":
-   nanosite_gen.main()
+   main(sys.argv[1:])

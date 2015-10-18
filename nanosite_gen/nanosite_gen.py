@@ -1,6 +1,8 @@
 import markdown
 import os
 import datetime
+import pkg_resources
+import shutil
 
 __version__ = "0.1"
 
@@ -9,6 +11,7 @@ PostsDirectory = "posts/"
 PagesDirectory = "pages/"
 TemplatesDirectory = "templates/"
 ArchiveDirectory = "archive/"
+Templates = ["footer", "header", "main", "page", "post"]
 FrontMaxPosts = 5      # how many posts to show on front page
 
 def insert_attribs(p, attribs):
@@ -25,9 +28,17 @@ def insert_attribs(p, attribs):
         p = p.replace(attrib, attribs[attrib])
     return p
 
-def load_template(filename):
-    """Loads a template in the templates directory with filename [filename]."""
-    return open(TemplatesDirectory + filename, "r").read()
+def load_template(name):
+    """Loads a template in the templates directory with name [name],
+    and corresponding filename [name]-template.html."""
+    return open(TemplatesDirectory + name + "-template.html", "r").read()
+
+def load_templates():
+    """Load all templates."""
+    templates = {}
+    for name in Templates:
+        templates[name] = load_template(name)
+    return templates
     
 def load_markdown(filename):
     """Converts a Markdown file to HTML and returns a tuple (html, meta) where
@@ -72,7 +83,7 @@ def load_pages(directory=PagesDirectory):
 
 posts_cache = {}
 post_titles = {}
-def make_post(filename):
+def make_post(site_meta, templates, filename):
     """Builds the post with filename [filename] and returns the completed
     HTML string.
     These are cached so each page is only built on the first call."""
@@ -88,7 +99,7 @@ def make_post(filename):
     post_attribs = {"$POST_TITLE$": post_title,
                     "$POST_CONTENT$": post_content,
                     "$POST_DATE$": post_date}
-    post = insert_attribs(post_template, post_attribs)
+    post = insert_attribs(templates["post"], post_attribs)
     posts_cache[filename] = post
     return post
 
@@ -106,7 +117,7 @@ def string_of_date(date):
     """Returns formatted string D Mon Y"""
     return "{} {} {}".format(date.day, date.strftime("%b"), date.year)
 
-def make_menu(pages, base=True):
+def make_menu(site_meta, templates, pages, base=True):
     """Returns navigation bar encapsulated in <nav> element.
     Built from a list (so <li>, <ul> elements).
     List items are given class "menu-item"."""
@@ -125,7 +136,8 @@ def make_menu(pages, base=True):
         for directory in sorted(directories):
             menu_string += "<li><a href=\"#\">{}</a>".format(directory)
             menu_string += "<ul>"
-            menu_string += make_menu(directories[directory], base=False)
+            menu_string += make_menu(site_meta, templates,
+                                     directories[directory], base=False)
             menu_string += "</ul></li>"
 
     # Files
@@ -143,19 +155,19 @@ def make_menu(pages, base=True):
     return menu_string
 
 header_cache = None
-def make_header():
+def make_header(site_meta, templates):
     """Builds the site header and returns the completed HTML code.
     This is cached so it's only built on the first call."""
     global header_cache
     if header_cache is not None:
         return header_cache
     
-    menu = make_menu(load_pages())
+    menu = make_menu(site_meta, templates, load_pages())
     attribs = {"$SITE_URL$": site_meta["url"],
                "$TITLE$": site_meta["title"],
                "$TAGLINE$": site_meta["tagline"],
                "$MENU$": menu}
-    header_cache = insert_attribs(header_template, attribs)
+    header_cache = insert_attribs(templates["header"], attribs)
     return header_cache
 
 def sorted_post_paths():
@@ -167,7 +179,7 @@ def sorted_post_paths():
     paths = sorted(paths, key=lambda p:date_of_file(p), reverse=True)
     return paths
     
-def make_content_from_posts():
+def make_content_from_posts(site_meta, templates):
     """Builds and concatenates together posts in the posts directory,
     up to a maximum of [FrontMaxPosts] posts."""
     html = ""
@@ -178,7 +190,7 @@ def make_content_from_posts():
         # only process Markdown files
         if os.path.isfile(path) and os.path.splitext(path)[1] == ".md":
             # make post
-            post_html = make_post(path)
+            post_html = make_post(site_meta, templates, path)
             # append
             html += post_html
 
@@ -187,7 +199,7 @@ def make_content_from_posts():
     return html
 
 footer_cache = None
-def make_footer():
+def make_footer(site_meta, templates):
     """Builds the site footer and returns the completed HTML code.
     This is cached so it's only built on the first call."""
     global footer_cache
@@ -195,23 +207,23 @@ def make_footer():
         return footer_cache
     
     attribs = {"$AUTHOR$": site_meta["author"]}
-    footer_cache = insert_attribs(footer_template, attribs)
+    footer_cache = insert_attribs(templates["footer"], attribs)
     return footer_cache
 
-def gen_front():
+def gen_front(site_meta, templates):
     """Builds the front page and writes to index.html."""
     attribs = {"$SITE_URL$": site_meta["url"],
                "$TITLE$": site_meta["title"],
-               "$HEADER$": make_header(),
-               "$CONTENT$": make_content_from_posts(),
-               "$FOOTER$": make_footer()}
-    page = insert_attribs(main_template, attribs)
+               "$HEADER$": make_header(site_meta, templates),
+               "$CONTENT$": make_content_from_posts(site_meta, templates),
+               "$FOOTER$": make_footer(site_meta, templates)}
+    page = insert_attribs(templates["main"], attribs)
 
     output_file = open("index.html", "w")
     output_file.write(page)
     output_file.close()
 
-def gen_page(filename, page):
+def gen_page(site_meta, templates, filename, page):
     """Generates the page with filename [filename] and contents [page] in the
     form of the (html, meta) tuple outputted by [load_markdown]."""
     
@@ -220,41 +232,43 @@ def gen_page(filename, page):
     page_title = meta["title"] if "title" in meta else name
     attribs = {"$PAGE_TITLE$": page_title,
                "$CONTENT$": html}
-    content = insert_attribs(page_template, attribs)
+    content = insert_attribs(templates["page"], attribs)
 
     attribs = {"$SITE_URL$": site_meta["url"],
                "$TITLE$": site_meta["title"],
-               "$HEADER$": make_header(),
+               "$HEADER$": make_header(site_meta, templates),
                "$CONTENT$": content,
-               "$FOOTER$": make_footer()}
-    page_output = insert_attribs(main_template, attribs)
+               "$FOOTER$": make_footer(site_meta, templates)}
+    page_output = insert_attribs(templates["main"], attribs)
     
     output_file = open(name + ".html", "w")
     output_file.write(page_output)
     output_file.close()
+
+def gen_pages(site_meta, templates, pages=None):
+    """Generate all pages.
+    Set the [pages] parameter to generate only specific pages."""
     
-def gen_pages(pages=load_pages()):
-    """Generate all pages."""
+    if not pages:
+        pages = load_pages()
+        
     directories = pages[0]
     for directory in directories:
-        gen_pages(directories[directory])
+        gen_pages(site_meta, templates, directories[directory])
 
     files = pages[1]
     for filename in files:
-        gen_page(filename, files[filename])
+        gen_page(site_meta, templates, filename, files[filename])
 
-def gen_archive():
+def gen_archive(site_meta, templates):
     """Generate the post archive:
     - Build all posts and put in archive folder.
     - Generate archive.html with links to all posts."""
-    # Create the archive directory if it doesn't already exist
-    if not os.path.exists(ArchiveDirectory):
-        os.makedirs(ArchiveDirectory)
-
+    
     # Archive posts and build archive_md (formatted list of post links)
     archive_md = ""
     for path in sorted_post_paths():
-        html = make_post(path)
+        html = make_post(site_meta, templates, path)
         name = os.path.splitext(os.path.basename(path))[0]
         output_path = ArchiveDirectory + name + ".html"
         output_file = open(output_path, "w")
@@ -267,27 +281,105 @@ def gen_archive():
 
     # Create archive page based on page template
     archive_html = markdown.markdown(archive_md)
-    gen_page("archive.html", (archive_html, {"title": "Archive"}))
+    gen_page(site_meta, templates, "archive.html",
+             (archive_html, {"title": "Archive"}))
 
-site_meta = None
-main_template = None
-header_template = None
-post_template = None
-page_template = None
-footer_template = None
-def main():
-    global site_meta, main_template, header_template, post_template, \
-           page_template, footer_template
+def gen_site():
     # Load settings as meta attributes from "meta.md"
     # Note: All URLs must have trailing slash
     site_meta = load_markdown("meta.md")[1]  # get meta info only
+    
+    templates = load_templates()
 
-    main_template = load_template("main-template.html")
-    header_template = load_template("header-template.html")
-    post_template = load_template("post-template.html")
-    page_template = load_template("page-template.html")
-    footer_template = load_template("footer-template.html")
+    gen_front(site_meta, templates)
+    gen_pages(site_meta, templates)
+    gen_archive(site_meta, templates)
 
-    gen_front()
-    gen_pages()
-    gen_archive()
+def setup_blank_site(meta):
+    def safe_mkdir(name):
+        # Create the directory if it doesn't already exist
+        if not os.path.exists(name):
+            os.mkdir(name)
+
+    # Write meta.md
+    output = open("meta.md", "w")
+    for key in meta:
+        output.write(key + ": " + meta[key] + "\n")
+    output.close()
+
+    # Create folders
+    safe_mkdir(PagesDirectory)
+    safe_mkdir(PostsDirectory)
+    safe_mkdir(TemplatesDirectory)
+    safe_mkdir(ArchiveDirectory)
+
+    # Copy default templates
+    for name in Templates:
+        rsc_path = "templates/" + name + "-template.html"
+        src = pkg_resources.resource_filename(__name__, rsc_path)
+        shutil.copyfile(src, TemplatesDirectory + name + "-template.html")
+
+    # Copy style.css
+    src = pkg_resources.resource_filename(__name__, "style.css")
+    shutil.copyfile(src, "style.css")
+
+    # Generate the site
+    gen_site()
+    
+def setup_site_interactive():
+    def prompt_YN(prompt):
+        full_prompt = prompt + " [y/n] "
+        print(full_prompt, end="")
+        x = input()
+        while x.lower()[:1] != "y" and x.lower()[:1] != "n":
+            print("Invalid option. Type 'y' for yes and 'n' for no.")
+            print(full_prompt, end="")
+            x = input()
+        return x.lower()[:1]
+        
+    print("-- nanosite --")
+    setup_site = prompt_YN("Would you like to set up a site in this directory?")
+    if setup_site == "y":
+        print("Enter a title for your site: ", end="")
+        title = input()
+        print("Enter a tagline for your site: ", end="")
+        tagline = input()
+        print("Enter the author name for your site: ", end="")
+        author = input()
+        print("Enter the base URL where you will upload your site to.")
+        print(" - Example: http://mysite.com/")
+        print("Base URL: ", end="")
+        site_url = input()
+        if site_url[-1:] != "/":    # add trailing slash if needed
+            site_url += "/"
+        meta = {"title": title,
+                "tagline": tagline,
+                "author": author,
+                "url": site_url}
+        setup_blank_site(meta)
+        print("Success! Generated site.")
+    else:
+        print("Canceled.")
+
+def main(argv):
+    def do_gen_site():
+        gen_site()
+        print("Generated site.")
+        
+    cmd = argv[0].lower() if len(argv) >= 1 else ""
+    if cmd == "":
+        # if site exists, build it
+        if os.path.exists("meta.md") and os.path.isfile("meta.md"):
+            do_gen_site()
+        else:
+            setup_site_interactive()
+    elif cmd == "init":
+        setup_site_interactive()
+    elif cmd == "build":
+        do_gen_site()
+    elif cmd == "--help":
+        print("Usage: nanosite [command]. Valid commands:")
+        print("  init -- Start a new site in this directory.")
+        print("  build -- Build the site in this directory.")
+    else:
+        print("nanosite: Invalid option. See 'nanosite --help'.")
