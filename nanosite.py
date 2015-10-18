@@ -2,10 +2,12 @@ import markdown
 import os
 import datetime
 
-PostsDirectory = "posts/"    # with trailing slash
-PagesDirectory = "pages/"    # with trailing slash
+# directories must have trailing slash
+PostsDirectory = "posts/"
+PagesDirectory = "pages/"
 TemplatesDirectory = "templates/"
-#PageNumPosts = 10      # how many posts to show on front page
+ArchiveDirectory = "archive/"
+FrontMaxPosts = 5      # how many posts to show on front page
 
 def insert_attribs(p, attribs):
     """This is the main mechanism to fill in templates by replacing
@@ -62,17 +64,33 @@ def load_pages(directory=PagesDirectory):
     pages_cache[directory] = pages
     return pages
 
-def make_post(filename, post_date=""):
+posts_cache = {}
+post_titles = {}
+def make_post(filename):
     """Builds the post with filename [filename] and returns the completed
-    HTML string."""
+    HTML string.
+    These are cached so each page is only built on the first call."""
+    global posts_cache
+    if filename in posts_cache:
+        return posts_cache[filename]
+    
     post_content, meta = load_markdown(filename)
     post_title = meta["title"] if "title" in meta else ""
+    post_titles[os.path.basename(filename)] = post_title
+    post_date = string_of_date(date_of_file(filename))
     
     post_attribs = {"$POST_TITLE$": post_title,
                     "$POST_CONTENT$": post_content,
                     "$POST_DATE$": post_date}
-    return insert_attribs(post_template, post_attribs)
+    post = insert_attribs(post_template, post_attribs)
+    posts_cache[filename] = post
+    return post
 
+def title_of_post(filename):
+    """Get title of post based on its filename"""
+    global post_titles
+    return post_titles[os.path.basename(filename)]
+    
 def date_of_file(filename):
     """Gets the creation date of the file."""
     t = os.stat(filename).st_birthtime
@@ -134,26 +152,33 @@ def make_header():
     header_cache = insert_attribs(header_template, attribs)
     return header_cache
 
-def make_content_from_posts():
-    """Builds and concatenates together all posts in the posts directory."""
-    posts = ""
-
+def sorted_post_paths():
+    """Get the paths of all posts, sorted by date created (newest first)."""
     paths = []
     for filename in os.listdir(PostsDirectory):
         paths.append(PostsDirectory + filename)
     # sort by most recent post
     paths = sorted(paths, key=lambda p:date_of_file(p), reverse=True)
+    return paths
+    
+def make_content_from_posts():
+    """Builds and concatenates together posts in the posts directory,
+    up to a maximum of [FrontMaxPosts] posts."""
+    html = ""
 
-    for path in paths:
+    paths = sorted_post_paths()
+
+    for path in paths[:FrontMaxPosts]:
         # only process Markdown files
         if os.path.isfile(path) and os.path.splitext(path)[1] == ".md":
-            # get date of post
-            date = string_of_date(date_of_file(path))
             # make post
-            html = make_post(path, date)
+            post_html = make_post(path)
             # append
-            posts += html
-    return posts
+            html += post_html
+
+    older_posts_link = "<a href=\"{}archive.html\">View older posts.</a>"
+    html += older_posts_link.format(site_meta["url"])
+    return html
 
 footer_cache = None
 def make_footer():
@@ -211,6 +236,32 @@ def gen_pages(pages=load_pages()):
     files = pages[1]
     for filename in files:
         gen_page(filename, files[filename])
+
+def gen_archive():
+    """Generate the post archive:
+    - Build all posts and put in archive folder.
+    - Generate archive.html with links to all posts."""
+    # Create the archive directory if it doesn't already exist
+    if not os.path.exists(ArchiveDirectory):
+        os.makedirs(ArchiveDirectory)
+
+    # Archive posts and build archive_md (formatted list of post links)
+    archive_md = ""
+    for path in sorted_post_paths():
+        html = make_post(path)
+        name = os.path.splitext(os.path.basename(path))[0]
+        output_path = ArchiveDirectory + name + ".html"
+        output_file = open(output_path, "w")
+        output_file.write(html)
+        output_file.close()
+
+        title = title_of_post(path)
+        url = site_meta["url"] + output_path
+        archive_md += "* [{}]({})\n".format(title, url)
+
+    # Create archive page based on page template
+    archive_html = markdown.markdown(archive_md)
+    gen_page("archive.html", (archive_html, {"title": "Archive"}))
     
 # Load settings as meta attributes from "meta.md"
 # Note: All URLs must have trailing slash
@@ -224,3 +275,4 @@ footer_template = open(TemplatesDirectory + "footer-template.html", "r").read()
 
 gen_front()
 gen_pages()
+gen_archive()
