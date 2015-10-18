@@ -1,5 +1,5 @@
 # nanosite
-Nanosite is a speedy static site generator in Python. It's a thin layer around your content and customizable to the core. Feedback and pull requests are welcome.
+nanosite is a speedy static site generator in Python. It's a thin layer around your content and customizable to the core. Feedback and pull requests are welcome.
 
 Here's a website made with nanosite: [wanganzhou.com](http://wanganzhou.com/).
 
