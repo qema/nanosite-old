@@ -1,0 +1,6 @@
+#!python
+
+import nanosite_gen
+
+if __name__ == "__main__":
+   nanosite_gen.main()

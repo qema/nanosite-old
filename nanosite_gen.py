@@ -2,6 +2,8 @@ import markdown
 import os
 import datetime
 
+__version__ = "0.1"
+
 # directories must have trailing slash
 PostsDirectory = "posts/"
 PagesDirectory = "pages/"
@@ -23,6 +25,10 @@ def insert_attribs(p, attribs):
         p = p.replace(attrib, attribs[attrib])
     return p
 
+def load_template(filename):
+    """Loads a template in the templates directory with filename [filename]."""
+    return open(TemplatesDirectory + filename, "r").read()
+    
 def load_markdown(filename):
     """Converts a Markdown file to HTML and returns a tuple (html, meta) where
     [html] is the converted contents of the file and [meta] is a dictionary
@@ -262,17 +268,26 @@ def gen_archive():
     # Create archive page based on page template
     archive_html = markdown.markdown(archive_md)
     gen_page("archive.html", (archive_html, {"title": "Archive"}))
-    
-# Load settings as meta attributes from "meta.md"
-# Note: All URLs must have trailing slash
-site_meta = load_markdown("meta.md")[1]  # get meta info only
 
-main_template = open(TemplatesDirectory + "main-template.html", "r").read()
-header_template = open(TemplatesDirectory + "header-template.html", "r").read()
-post_template = open(TemplatesDirectory + "post-template.html", "r").read()
-page_template = open(TemplatesDirectory + "page-template.html", "r").read()
-footer_template = open(TemplatesDirectory + "footer-template.html", "r").read()
+site_meta = None
+main_template = None
+header_template = None
+post_template = None
+page_template = None
+footer_template = None
+def main():
+    global site_meta, main_template, header_template, post_template, \
+           page_template, footer_template
+    # Load settings as meta attributes from "meta.md"
+    # Note: All URLs must have trailing slash
+    site_meta = load_markdown("meta.md")[1]  # get meta info only
 
-gen_front()
-gen_pages()
-gen_archive()
+    main_template = load_template("main-template.html")
+    header_template = load_template("header-template.html")
+    post_template = load_template("post-template.html")
+    page_template = load_template("page-template.html")
+    footer_template = load_template("footer-template.html")
+
+    gen_front()
+    gen_pages()
+    gen_archive()
