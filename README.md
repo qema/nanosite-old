@@ -17,8 +17,8 @@ Download the repo and run setup.py install:
 ## How to Use
 To start a new site, simply run `nanosite` at the terminal, in the directory you want the site to be in. Follow the prompts to generate a blank site. After editing your site, run `nanosite` again to build it. Or, type `nanosite build` to do this explicitly.
 
-Put your posts, or time-sorted content, as `.md` files in the `posts/` directory.  
-Put your pages, or static content, as `.md` in the `pages/` directory. Or, you can create folders in this directory, which will become category names. Every page in one of these sub-folders will be organized accordingly in the site's navigation bar.
+- Put your posts, or time-sorted content, as `.md` files in the `posts/` directory.  
+- Put your pages, or static content, as `.md` files in the `pages/` directory. Or, you can create folders in this directory, which will become category names. Every page in one of these sub-folders will be organized accordingly in the site's navigation bar.
 
 Example directory structure:
 - mysite/
