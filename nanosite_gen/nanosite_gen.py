@@ -260,6 +260,18 @@ def gen_pages(site_meta, templates, pages=None):
     for filename in files:
         gen_page(site_meta, templates, filename, files[filename])
 
+def gen_archive_entry(site_meta, templates, path):
+    attribs = {"$SITE_URL$": site_meta["url"],
+               "$TITLE$": site_meta["title"],
+               "$HEADER$": make_header(site_meta, templates),
+               "$CONTENT$": make_post(site_meta, templates, path),
+               "$FOOTER$": make_footer(site_meta, templates)}
+    page = insert_attribs(templates["main"], attribs)
+    name = os.path.splitext(os.path.basename(path))[0]
+    output_file = open(ArchiveDirectory + name + ".html", "w")
+    output_file.write(page)
+    output_file.close()
+    
 def gen_archive(site_meta, templates):
     """Generate the post archive:
     - Build all posts and put in archive folder.
@@ -268,12 +280,10 @@ def gen_archive(site_meta, templates):
     # Archive posts and build archive_md (formatted list of post links)
     archive_md = ""
     for path in sorted_post_paths():
-        html = make_post(site_meta, templates, path)
+        gen_archive_entry(site_meta, templates, path)
+        
         name = os.path.splitext(os.path.basename(path))[0]
         output_path = ArchiveDirectory + name + ".html"
-        output_file = open(output_path, "w")
-        output_file.write(html)
-        output_file.close()
 
         title = title_of_post(path)
         url = site_meta["url"] + output_path
