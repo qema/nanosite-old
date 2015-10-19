@@ -194,8 +194,6 @@ def make_content_from_posts(site_meta, templates):
             # append
             html += post_html
 
-    older_posts_link = "<a href=\"{}archive.html\">View older posts.</a>"
-    html += older_posts_link.format(site_meta["url"])
     return html
 
 footer_cache = None
@@ -216,6 +214,8 @@ def gen_front(site_meta, templates):
                "$TITLE$": site_meta["title"],
                "$HEADER$": make_header(site_meta, templates),
                "$CONTENT$": make_content_from_posts(site_meta, templates),
+               "$NAV_LINK$": site_meta["url"] + "archive.html",
+               "$NAV_TEXT$": "View older posts.",
                "$FOOTER$": make_footer(site_meta, templates)}
     page = insert_attribs(templates["main"], attribs)
 
@@ -238,6 +238,8 @@ def gen_page(site_meta, templates, filename, page):
                "$TITLE$": site_meta["title"],
                "$HEADER$": make_header(site_meta, templates),
                "$CONTENT$": content,
+               "$NAV_LINK$": site_meta["url"],
+               "$NAV_TEXT$": "Return to home.",
                "$FOOTER$": make_footer(site_meta, templates)}
     page_output = insert_attribs(templates["main"], attribs)
     
@@ -265,6 +267,8 @@ def gen_archive_entry(site_meta, templates, path):
                "$TITLE$": site_meta["title"],
                "$HEADER$": make_header(site_meta, templates),
                "$CONTENT$": make_post(site_meta, templates, path),
+               "$NAV_LINK$": site_meta["url"] + "archive.html",
+               "$NAV_TEXT$": "Return to archives.",
                "$FOOTER$": make_footer(site_meta, templates)}
     page = insert_attribs(templates["main"], attribs)
     name = os.path.splitext(os.path.basename(path))[0]
