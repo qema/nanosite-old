@@ -36,6 +36,6 @@ nanosite can infer default titles for each post or page, but if you want to set 
 
     title: My Latest Adventure
     
-    I just had the greatest trip to Iceland! ...
+    I've returned from my trek to the Antarctic. ...
 
 nanosite will use your titles accordingly.
