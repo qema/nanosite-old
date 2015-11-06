@@ -10,7 +10,7 @@ Here's a website made with nanosite: [wanganzhou.com](http://wanganzhou.com/).
 * Simple, fast workflow.
 
 ## How to Install
-Download the repo and run setup.py install:
+nanosite uses Python 3. Download the repo and run setup.py install:
 
     python setup.py install
 
