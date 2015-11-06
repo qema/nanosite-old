@@ -1,0 +1,122 @@
+body {
+    font-family: Cambria;
+    margin-left: 20%;
+    margin-right: 20%;
+}
+
+.header {
+    text-align: center;
+    margin-top: 1.2em;
+    margin-bottom: 3em;
+}
+
+.header-title {
+    font-size: 3em;
+    color: black;
+    text-decoration: none;
+}
+
+.header-title:hover {
+    color: black;
+    text-decoration: underline;
+}
+
+.header-tagline {
+    font-size: 0.8em;
+}
+
+.nav-bar {
+    display: block;
+    margin: 1em;
+}
+
+.nav-bar ul {
+    list-style: none;
+    margin: 0;
+    padding-left: 0;
+}
+
+.nav-bar li {
+    display: inline;
+    float: center;
+    padding: 1em;
+    position: relative;
+}
+  
+.nav-bar li a {
+    text-decoration: none;
+    display: inline-block;
+    color: black;
+}
+
+.nav-bar li:hover {
+    cursor: pointer;
+}
+
+.nav-bar ul li ul {
+    visibility: hidden;
+    min-width: 150px;
+    position: absolute;
+    text-align: left;
+    left: 0;
+    z-index: 999;
+}
+
+.nav-bar ul li a:hover {
+    color: red;
+}
+
+.nav-bar ul li:hover > ul,
+.nav-bar ul li ul:hover {
+    visibility: visible;
+}
+
+.nav-bar ul li ul li {
+    clear: both;
+    padding: 0 0 0 1em;
+    width: 100%;
+}
+
+.nav-bar ul li ul li a:hover {
+    text-decoration: none;
+    color: red;
+}
+
+.content {
+}
+
+.post {
+    margin-bottom: 3em;
+}
+
+.page-title, .post-title {
+    margin-top: 0;
+    margin-bottom: 0;
+    font-size: 1.8em;
+    font-weight: bold;
+}
+
+.post-meta {
+    font-size: 0.8em;
+}
+
+p, .bottom-nav {
+    font-size: 1em;
+}
+
+a {
+    color: black;
+}
+a:hover {
+    color: red;
+}
+
+h2 {
+    font-size: 1.2em;
+}
+
+.footer {
+    text-align: center;
+    font-size: 0.8em;
+    margin-bottom: 2em;
+}

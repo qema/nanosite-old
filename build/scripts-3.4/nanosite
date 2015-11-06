@@ -1,0 +1,8 @@
+#!/Library/Frameworks/Python.framework/Versions/3.4/bin/python3
+
+import sys
+import os
+from nanosite_gen.nanosite_gen import main
+
+if __name__ == "__main__":
+   main(sys.argv[1:])

@@ -1,0 +1,27 @@
+<!-- Template for every page. Client must provide: 
+SITE_URL - URL of site (with trailing slash)
+TITLE - Title of site
+HEADER - Header bar (will be generated from header-template.html)
+CONTENT - Main content (will be generated from post-template.html)
+NAV_LINK - Context-based address to link to (depending on the page)
+NAV_TEXT - The text of the NAV_LINK
+FOOTER - Footer bar (will be generated from footer-template.html)  -->
+
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="$SITE_URL$style.css">
+    <title>$TITLE$</title>
+</head>
+<body>
+  $HEADER$
+  <div class="content">
+    $CONTENT$
+  </div>
+  <div class="bottom-nav">
+    <a href="$NAV_LINK$">$NAV_TEXT$</a>
+  </div>
+  $FOOTER$
+</body>
+</html>

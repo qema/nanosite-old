@@ -110,8 +110,7 @@ def title_of_post(filename):
     
 def date_of_file(filename):
     """Gets the creation date of the file."""
-    t = os.stat(filename).st_birthtime if os.name != "nt" else \
-        os.path.getctime(filename)
+    t = os.stat(filename).st_birthtime
     return datetime.datetime.fromtimestamp(t)
 
 def string_of_date(date):
