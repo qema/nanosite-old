@@ -143,7 +143,7 @@ def make_menu(site_meta, templates, pages, base=True):
 
     # Files
     files = pages[1]
-    for filename in files:
+    for filename in sorted(files):
         name = os.path.splitext(filename)[0]
         url = site_meta["url"] + name + ".html"
         meta = files[filename][1]

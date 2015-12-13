@@ -110,7 +110,8 @@ def title_of_post(filename):
     
 def date_of_file(filename):
     """Gets the creation date of the file."""
-    t = os.stat(filename).st_birthtime
+    t = os.stat(filename).st_birthtime if os.name != "nt" else \
+        os.path.getctime(filename)
     return datetime.datetime.fromtimestamp(t)
 
 def string_of_date(date):
@@ -142,7 +143,7 @@ def make_menu(site_meta, templates, pages, base=True):
 
     # Files
     files = pages[1]
-    for filename in files:
+    for filename in sorted(files):
         name = os.path.splitext(filename)[0]
         url = site_meta["url"] + name + ".html"
         meta = files[filename][1]
