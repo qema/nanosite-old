@@ -40,7 +40,7 @@ def load_templates():
         templates[name] = load_template(name)
     return templates
     
-def load_markdown(filename):
+def load_markdown(filename, site_meta=None):
     """Converts a Markdown file to HTML and returns a tuple (html, meta) where
     [html] is the converted contents of the file and [meta] is a dictionary
     mapping meta properties to values. These meta properties are given at the
@@ -48,9 +48,16 @@ def load_markdown(filename):
 
     Name1: Value1
     Name2: Value2
-    ..."""
+    ...
+
+    The Markdown file also has access to all attributes defined in site_meta,
+    which it can access with dollar signs: $attrib$."""
     
     file_md = open(filename, "r").read()
+    # Insert attribs from meta, adding surrounding dollar signs
+    if site_meta is not None:
+        file_md = insert_attribs(file_md, {"$"+k+"$":v for k, v in site_meta.items()})
+    
     # Markdown will parse metadata in posts
     md = markdown.Markdown(extensions = ["markdown.extensions.meta"])
     html = md.convert(file_md)
@@ -59,7 +66,7 @@ def load_markdown(filename):
     return (html, meta)
 
 pages_cache = {}
-def load_pages(directory=PagesDirectory):
+def load_pages(site_meta, directory=PagesDirectory):
     """ Loads and returns all of the pages in [directory].
     These are cached so they are only loaded on the first call.
     Precondition: directory name ends with a slash '/'."""
@@ -74,9 +81,9 @@ def load_pages(directory=PagesDirectory):
         path = directory + filename
         # only process Markdown files
         if os.path.isfile(path) and os.path.splitext(filename)[1] == ".md":
-            pages[1][filename] = load_markdown(path)
+            pages[1][filename] = load_markdown(path, site_meta)
         elif os.path.isdir(path):
-            pages[0][filename] = load_pages(directory + filename + "/")
+            pages[0][filename] = load_pages(site_meta, directory + filename + "/")
 
     pages_cache[directory] = pages
     return pages
@@ -91,7 +98,7 @@ def make_post(site_meta, templates, filename):
     if filename in posts_cache:
         return posts_cache[filename]
     
-    post_content, meta = load_markdown(filename)
+    post_content, meta = load_markdown(filename, site_meta)
     post_title = meta["title"] if "title" in meta else ""
     post_titles[os.path.basename(filename)] = post_title
     post_date = string_of_date(date_of_file(filename))
@@ -163,7 +170,7 @@ def make_header(site_meta, templates):
     if header_cache is not None:
         return header_cache
     
-    menu = make_menu(site_meta, templates, load_pages())
+    menu = make_menu(site_meta, templates, load_pages(site_meta))
     attribs = {"$SITE_URL$": site_meta["url"],
                "$TITLE$": site_meta["title"],
                "$TAGLINE$": site_meta["tagline"],
@@ -253,7 +260,7 @@ def gen_pages(site_meta, templates, pages=None):
     Set the [pages] parameter to generate only specific pages."""
     
     if not pages:
-        pages = load_pages()
+        pages = load_pages(site_meta)
         
     directories = pages[0]
     for directory in directories:
