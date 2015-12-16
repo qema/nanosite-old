@@ -8,6 +8,7 @@ nanosite_gen/__init__.py
 nanosite_gen/nanosite_gen.py
 nanosite_gen/style.css
 nanosite_gen/templates/footer-template.html
+nanosite_gen/templates/front-template.html
 nanosite_gen/templates/header-template.html
 nanosite_gen/templates/main-template.html
 nanosite_gen/templates/page-template.html

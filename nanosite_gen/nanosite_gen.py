@@ -11,7 +11,7 @@ PostsDirectory = "posts/"
 PagesDirectory = "pages/"
 TemplatesDirectory = "templates/"
 ArchiveDirectory = "archive/"
-Templates = ["footer", "header", "main", "page", "post"]
+Templates = ["footer", "header", "main", "front", "page", "post"]
 FrontMaxPosts = 5      # how many posts to show on front page
 
 def insert_attribs(p, attribs):
@@ -218,10 +218,15 @@ def make_footer(site_meta, templates):
 
 def gen_front(site_meta, templates):
     """Builds the front page and writes to index.html."""
+
+    content = insert_attribs(templates["front"],
+                             {"$POSTS$":
+                              make_content_from_posts(site_meta, templates)})
+    
     attribs = {"$SITE_URL$": site_meta["url"],
                "$TITLE$": site_meta["title"],
                "$HEADER$": make_header(site_meta, templates),
-               "$CONTENT$": make_content_from_posts(site_meta, templates),
+               "$CONTENT$": content,
                "$NAV_LINK$": site_meta["url"] + "archive.html",
                "$NAV_TEXT$": "View older posts.",
                "$FOOTER$": make_footer(site_meta, templates)}
