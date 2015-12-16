@@ -56,7 +56,8 @@ def load_markdown(filename, site_meta=None):
     file_md = open(filename, "r").read()
     # Insert attribs from meta, adding surrounding dollar signs
     if site_meta is not None:
-        file_md = insert_attribs(file_md, {"$"+k+"$":v for k, v in site_meta.items()})
+        file_md = insert_attribs(file_md, \
+                                 {"$"+k+"$":v for k, v in site_meta.items()})
     
     # Markdown will parse metadata in posts
     md = markdown.Markdown(extensions = ["markdown.extensions.meta"])
@@ -83,7 +84,8 @@ def load_pages(site_meta, directory=PagesDirectory):
         if os.path.isfile(path) and os.path.splitext(filename)[1] == ".md":
             pages[1][filename] = load_markdown(path, site_meta)
         elif os.path.isdir(path):
-            pages[0][filename] = load_pages(site_meta, directory + filename + "/")
+            pages[0][filename] = load_pages(site_meta, directory + \
+                                                       filename + "/")
 
     pages_cache[directory] = pages
     return pages
@@ -138,15 +140,14 @@ def make_menu(site_meta, templates, pages, base=True):
         site_url = site_meta["url"]
         menu_string += menu_item_template.format(site_url + "index.html", \
                                                  "Home")
-        # Directories become categories
-        # Only do this in base case (no subdirectories allowed)
-        directories = pages[0]
-        for directory in sorted(directories):
-            menu_string += "<li><a href=\"#\">{}</a>".format(directory)
-            menu_string += "<ul>"
-            menu_string += make_menu(site_meta, templates,
-                                     directories[directory], base=False)
-            menu_string += "</ul></li>"
+    # Directories become categories
+    directories = pages[0]
+    for directory in sorted(directories):
+        menu_string += "<li><a href=\"#\">{}</a>".format(directory)
+        menu_string += "<ul>"
+        menu_string += make_menu(site_meta, templates,
+                                 directories[directory], base=False)
+        menu_string += "</ul></li>"
 
     # Files
     files = pages[1]
