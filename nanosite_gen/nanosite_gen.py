@@ -105,9 +105,11 @@ def make_post(site_meta, templates, filename):
     post_titles[os.path.basename(filename)] = post_title
     post_date = string_of_date(date_of_file(filename))
     
+    name = os.path.splitext(filename)[0]
     post_attribs = {"$POST_TITLE$": post_title,
                     "$POST_CONTENT$": post_content,
-                    "$POST_DATE$": post_date}
+                    "$POST_DATE$": post_date,
+                    "$POST_PERMALINK$": site_meta["url"] + ArchiveDirectory + name + ".html" }
     post = insert_attribs(templates["post"], post_attribs)
     posts_cache[filename] = post
     return post
