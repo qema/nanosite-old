@@ -105,7 +105,7 @@ def make_post(site_meta, templates, filename):
     post_titles[os.path.basename(filename)] = post_title
     post_date = string_of_date(date_of_file(filename))
     
-    name = os.path.splitext(os.path.basename(path))[0]
+    name = os.path.splitext(os.path.basename(filename))[0]
     post_attribs = {"$POST_TITLE$": post_title,
                     "$POST_CONTENT$": post_content,
                     "$POST_DATE$": post_date,
